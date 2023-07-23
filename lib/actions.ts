@@ -1,12 +1,6 @@
 import { createUserMutation, getUserQuery } from '@/graphql'
 import { GraphQLClient } from 'graphql-request'
 
-export type User = {
-  email: string
-  name: string
-  avatarUrl: string
-}
-
 const isProduction = process.env.NODE_ENV === 'production'
 const apiUrl = isProduction
   ? process.env.NEXT_PUBLIC_GRAFBASE_API_URL || ''

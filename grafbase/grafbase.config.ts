@@ -76,7 +76,7 @@ const Project = g
 
 const jwt = auth.JWT({
   issuer: 'grafbase',
-  secret: g.env('NEXT_AUTH_SECRET'),
+  secret: g.env('NEXTAUTH_SECRET'),
 })
 
 export default config({
