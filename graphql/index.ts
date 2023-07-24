@@ -27,34 +27,64 @@ export const createUserMutation = `
 		}
 	}
 `
+// export const projectsQuery = `
+//   query getProjects($category: String, $endcursor: String) {
+//     projectSearch(first: 8, after: $endcursor, filter: {category: {eq: $category}}) {
+//       pageInfo {
+//         hasNextPage
+//         hasPreviousPage
+//         startCursor
+//         endCursor
+//       }
+//       edges {
+//         node {
+//           title
+//           githubUrl
+//           description
+//           liveSiteUrl
+//           id
+//           image
+//           category
+//           createdBy {
+//             id
+//             email
+//             name
+//             avatarUrl
+//           }
+//         }
+//       }
+//     }
+//   }
+// `;
+
 export const projectsQuery = `
-  query getProjects($category: String, $endcursor: String) {
-    projectSearch(first: 8, after: $endcursor, filter: {category: {eq: $category}}) {
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
-      edges {
-        node {
-          title
-          githubUrl
-          description
-          liveSiteUrl
+query ProjectSearch {
+  projectSearch(first: 10) {
+    pageInfo {
+      hasPreviousPage
+      hasNextPage
+      startCursor
+      endCursor
+    }
+    edges {
+      node {
+        title
+        description
+        image
+        liveSiteUrl
+        githubUrl
+        category
+        id
+        createdBy {
+          name
+          email
+          avatarUrl
           id
-          image
-          category
-          createdBy {
-            id
-            email
-            name
-            avatarUrl
-          }
         }
       }
     }
   }
+}
 `
 
 export const getProjectByIdQuery = `
@@ -91,4 +121,27 @@ mutation CreateProject($input: ProjectCreateInput!) {
 		}
 	}
 }
+`
+
+export const getProjectsOfUserQuery = `
+  query getUserProjects($id: ID!, $last: Int = 4) {
+    user(by: { id: $id }) {
+      id
+      name
+      email
+      description
+      avatarUrl
+      githubUrl
+      linkedInUrl
+      projects(last: $last) {
+        edges {
+          node {
+            id
+            title
+            image
+          }
+        }
+      }
+    }
+  }
 `

@@ -1,12 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['lh3.googleusercontent.com'],
+    domains: ['lh3.googleusercontent.com', 'res.cloudinary.com'],
   },
   // issues with the packages that are not included in node js
-  // experimental: {
-  //   serverComponentsExternalPackages: ['cloudinary-react', 'graphql-request'],
-  // },
+  experimental: {
+    serverComponentsExternalPackages: ['cloudinary-react', 'graphql-request'],
+  },
 }
 
 module.exports = nextConfig
