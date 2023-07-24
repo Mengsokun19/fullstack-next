@@ -62,16 +62,17 @@ const User = g
 // @ts-ignore
 const Project = g
   .model('Project', {
-    name: g.string().length({ min: 3 }),
+    title: g.string().length({ min: 3 }),
+    description: g.string(),
     image: g.url(),
-    liveSiteUrl: g.url().optional(),
-    githubUrl: g.url().optional(),
+    liveSiteUrl: g.url(),
+    githubUrl: g.url(),
     category: g.string().search(),
-    createBy: g.relation(() => User),
+    createdBy: g.relation(() => User),
   })
   .auth((rules) => {
     rules.public().read()
-    rules.private().create().update().delete()
+    rules.private().create().delete().update()
   })
 
 const jwt = auth.JWT({

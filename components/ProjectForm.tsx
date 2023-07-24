@@ -1,30 +1,76 @@
 'use client'
 
-import { SessionInterface } from '@/common.types'
+import { FormState, ProjectInterface, SessionInterface } from '@/common.types'
 import { ChangeEvent, useState } from 'react'
 import Image from 'next/image'
 import FormField from './FormField'
 import { categoryFilters } from '@/constants'
 import CustomMenu from './CustomMenu'
+import Button from './Button'
+import { createNewProject, fetchToken } from '@/lib/actions'
+import { useRouter } from 'next/navigation'
 
 type Props = {
   type: string
   session: SessionInterface
+  propject?: ProjectInterface
 }
 
-const ProjectForm = ({ type, session }: Props) => {
+const ProjectForm = ({ type, session, propject }: Props) => {
+  const router = useRouter()
+
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     image: '',
     title: '',
     description: '',
     liveSiteUrl: '',
-    gitHubUrl: '',
+    githubUrl: '',
     category: '',
   })
 
-  const handleSubmit = (e: React.FormEvent) => {}
-  const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {}
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    setIsSubmitting(true)
+
+    const token = await fetchToken()
+
+    try {
+      if (type === 'create') {
+        await createNewProject(form, session?.user?.id, token)
+
+        router.push('/')
+      }
+    } catch (error) {
+      console.log(error, 'whut')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // Hanlde upload image to Cloudinary
+  const handleChangeImage = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault()
+
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.includes('image')) {
+      return alert('Please upload an image file')
+    }
+
+    const reader = new FileReader()
+
+    reader.readAsDataURL(file)
+
+    reader.onloadend = () => {
+      const result = reader.result as string
+
+      hanldeStateChange('image', result)
+    }
+  }
+
   const hanldeStateChange = (fieldName: string, value: string) => {
     setForm((prev) => ({ ...prev, [fieldName]: value }))
   }
@@ -44,14 +90,7 @@ const ProjectForm = ({ type, session }: Props) => {
           onChange={handleChangeImage}
         />
         {form.image && (
-          <Image
-            src={form.image}
-            alt="poster"
-            width={100}
-            height={100}
-            className="sm:-10 object-contain z-20"
-            fill
-          />
+          <Image src={form.image} alt="poster" className="sm:p-10 object-contain z-20" fill />
         )}
       </div>
 
@@ -63,7 +102,7 @@ const ProjectForm = ({ type, session }: Props) => {
       />
       <FormField
         title="Description"
-        state={form.title}
+        state={form.description}
         placeholder="Showcase & discover remarkable developer portfolios on Devfolio"
         setState={(value) => hanldeStateChange('description', value)}
       />
@@ -77,9 +116,9 @@ const ProjectForm = ({ type, session }: Props) => {
       <FormField
         type="url"
         title="GitHub URL"
-        state={form.gitHubUrl}
+        state={form.githubUrl}
         placeholder="https://github.com"
-        setState={(value) => hanldeStateChange('gitHubUrl', value)}
+        setState={(value) => hanldeStateChange('githubUrl', value)}
       />
 
       {/* Custom Inputs */}
@@ -91,7 +130,16 @@ const ProjectForm = ({ type, session }: Props) => {
       />
 
       <div className="flexStart w-full">
-        <button>Create</button>
+        <Button
+          title={
+            isSubmitting
+              ? `${type === 'create' ? 'Creating' : 'Updating'}`
+              : `${type === 'create' ? 'Create' : 'Update'}`
+          }
+          type="submit"
+          leftIcon={isSubmitting ? '' : '/plus.svg'}
+          isSubmitting={isSubmitting}
+        />
       </div>
     </form>
   )
